@@ -1,0 +1,101 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+df=pd.read_csv('company_sales_data.csv')#read the csv file and gave it dataframe
+x=df['month_number']#given x axis to the header month_number
+y=df['total_profit']
+plt.xlabel("Month number")
+plt.ylabel("profit in dollar")
+plt.plot(x,y,c="r",lw="3",marker="o")
+plt.legend(['red'], loc="upper left")#legend ke andar apan title bhi daal skte h (title="xyz") 
+plt.show()
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+df=pd.read_csv('company_sales_data.csv')
+x=df['month_number']
+y=['facecream','facewash','toothpaste','bathingsoap','shampoo','moisturizer']
+for n in y:#har graph ko plot krwane ke liye we use for loop jisme n khudne define kiya h  and label n is important for legend part
+    plt.plot(x, df[n], label=n)#isme ye y me itearate ho rha h because we have defined it as an array we cant iterate with int we have to use range(n)where n is an integer
+#there  is also a fun which combines matplot and pandas to plot graph we dont have touse the for loop df.plot(x='month_number', y=y) 
+plt.legend()#legend mein loop lagwane ki jroorat nhi
+plt.show()
+
+
+import matplotlib.pyplot as plt
+import pandas as pd#axis 0 horizontal
+df=pd.read_csv('company_sales_data.csv')
+y={}#y is declared as dictionary  cause ye x ko relate krke dictionary kitarah behave ekar rha h
+x=['facecream','facewash','toothpaste','bathingsoap','shampoo','moisturizer']
+for a in x:#append function is used to do add something in the list
+  y[a]=df[a].sum()#y jo dict h uska values wala part ke liye sum kiya
+# y jo dictionary h usko do list me store kiya one is keys(jo x h) second uski values
+values = list(y.values())
+#instead of using for loop finding sum and accessing its values wala part we can directly do values = df[x].sum().tolist()
+plt.pie(values,labels=x,autopct='%1.1f%%')#autopct for sowing the percentage
+plt.show()
+
+
+
+import numpy as np
+arr=np.array([[1,2,4],[7,13,21]])
+x=arr.shape[0]#it will access the o th pe jo number h
+y=arr.shape[1]
+arr2=np.empty((x,y))#it creates an empty array of shape x,y
+for a in range(y):#initially apan ko range nhi likhna pda because we defined upar y as an array but yaha integer pe iterate nhi kar skte
+  for b in range(x):
+    arr2[b,a]=np.random.randint(0,100)#randint to get integer value between 0 and 100
+print(arr2)
+
+
+import numpy as np
+x = np.array([[1,3,5],[4,7,11],[5,10,20]])
+sliced_array=x[:, 0:2]#first : mean we want to select all rows/select everything along that dimension also pehle : isliye row agar comma ke baad wali jagah likhte oh all columns
+a = np.array([[4, 5, 2],
+          [3, 7, 9],
+          [1, 4, 5],
+          [6, 6, 1]])
+a=a[0:3,1:3]#pehla wala represent row index 0 se 2 tak second is column
+b = np.array([1, 2, 3, 4])
+b=b+1#we can just simply write +1 this is known as broadcasting
+arr2 = np.array([[1, 2, 3],
+                 [4, 5, 6]])
+arr3 = np.array([[4],
+                 [5]])
+arr2=(arr2[0,:]*arr3[0,0],arr2[1,:]*arr3[1,0])#so ther are two methods to multiply two arrays
+arr2=np.multiply(arr3,arr2)
+print(arr2)
+
+
+import numpy as np
+import time
+
+# Create large arrays
+a = np.random.rand(1000000)
+b = np.random.rand(1000000)
+
+# Vectorized addition
+start_time = time.time()
+c = a + b
+vectorized_time = time.time() - start_time
+
+# Non-vectorized addition using a loop
+c = np.empty_like(a)
+start_time = time.time()
+for i in range(len(a)):
+    c[i] = a[i] + b[i]
+non_vectorized_time = time.time() - start_time
+
+print(f"Vectorized time: {vectorized_time:.6f} seconds")
+print(f"Non-vectorized time: {non_vectorized_time:.6f} seconds")
+
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+df=pd.read_csv('data.csv')
+newdf=df[df['irradiat']==1]#it basically make a new dataframe from irradiat whose value is 1 
+final=newdf['breast_quad_right_up'].values
+x=df['age']
+plt.bar(final,x)
+plt.show
