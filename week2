@@ -1,0 +1,137 @@
+#logistic resression
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn import datasets
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+breast_cancer = datasets.load_breast_cancer()
+X, y = breast_cancer.data, breast_cancer.target
+
+df = pd.DataFrame(X)
+#so there is a function which counts the number df.value_counts()
+one_df=df[y==1]
+zero_df=df[y==0]
+#to plot the data on same graph two subplots of two
+#fig, ax = plt.subplots()
+#ax.scatter(one_df[:,1],one_df[:,2],label='yes',color='blue',s=1)
+#ax.scatter(zero_df[:,1],zero_df[:,2],label='no',color='red',s=1)
+
+#now we will convert  both x and y to array
+X=np.asarray(X)
+y=np.asarray(y)
+#x[0:5] to 4 th column tak 1 collumn ek array ki form me
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1234)
+sc = StandardScaler()
+#X_train is like a numpy array after the train_test_split operation and they dont havr inbuilt index we use range
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
+
+def sigmoid(x):
+  return 1/(1+np.exp(-x))
+
+def BCELoss(Y,Y_pred):
+    #loop lga ke sum ki jroorat nhi there is a function to take mean also we cant use directly log use np.log
+      return -np.mean(Y*np.log(Y_pred)+(1-Y)*np.log(1-Y_pred))
+class LogisticRegression:
+    def __init__(self, lr=0.01, iters=1000):
+        self.lr = lr
+        self.iters = iters
+        self.weights = None
+        self.bias = None
+#weights and bias - logistic vo convert it to linear so in linear regression the equ is wx+b where w is slope
+    def fit(self, X, y):
+        n_samples, n_features = X.shape
+        self.weights = np.zeros(n_features)
+        self.bias = 0
+
+        for _ in range(self.iters):
+            linear_model = np.dot(X, self.weights) + self.bias
+            y_predicted = sigmoid(linear_model)
+
+            dw = (1 / n_samples) * np.dot(X.T, (y_predicted - y))
+            db = (1 / n_samples) * np.sum(y_predicted - y)
+
+            self.weights -= self.lr * dw
+            self.bias -= self.lr * db
+
+    def predict(self, X):
+        linear_model = np.dot(X, self.weights) + self.bias
+        y_predicted = sigmoid(linear_model)
+        y_predicted_cls = [1 if i > 0.5 else 0 for i in y_predicted]
+        return np.array(y_predicted_cls)
+
+# Train and evaluate the model
+model = LogisticRegression(lr=0.01, iters=1000)
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+
+accuracy = accuracy_score(y_test, predictions)
+print(f"Accuracy: {accuracy}")
+
+
+#svm
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+data = pd.read_csv('/content/drive/MyDrive/data (2).csv')
+
+
+x=data['feature1'].values
+y=data['feature2'].values
+
+#X = df[['feature1', 'feature2']].values
+plt.scatter(x,y,color='red',s=2)
+# Preprocess the data
+X = data.drop(columns=['target']).values
+y = data['target'].values
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+class SVM:
+    def __init__(self, learning_rate=0.001, lambda_param=0.01, n_iters=1000):
+        self.lr = learning_rate
+        self.lambda_param = lambda_param
+        self.n_iters = n_iters
+        self.w = None
+        self.b = None
+
+    def fit(self, X, y):
+        n_samples, n_features = X.shape
+        y_ = np.where(y <= 0, -1, 1)  # Ensure the targets are -1 or 1
+
+        self.w = np.zeros(n_features)
+        self.b = 0
+
+        for _ in range(self.n_iters):
+            for idx, x_i in enumerate(X):
+              #here x_i and w are in the from of vectors not matrix like (a,b) and (c,d) gives a*b+c*d
+                condition = y_[idx] * (np.dot(x_i, self.w) - self.b) >= 1
+                if condition:
+                    self.w -= self.lr * (2 * self.lambda_param * self.w)
+                else:
+                    self.w -= self.lr * (2 * self.lambda_param * self.w - np.dot(x_i, y_[idx]))
+                    # here dot of x_i and y_[ind] means it multiplies x_i with sclar y_[ind]
+                    self.b -= self.lr * y_[idx]
+#if we dont pass particular values and pass X_test which is (m*2) matrix and multiply with self.w which is (2*1) matrix we will get an array of(m*1) also bias is subtrcted from every index of array
+    def predict(self,X):
+        approx = np.dot(X, self.w) - self.b
+        return np.sign(approx)
+
+# Initialize the SVM model
+svm = SVM(learning_rate=0.001, lambda_param=0.01, n_iters=1000)
+
+# Train the model
+svm.fit(X_train, y_train)
+
+# Predict on the test set
+X_test=(-1.2,-1.3)
+predictions = svm.predict(X_test)
+print(predictions)
+# Calculate accuracy
+#accuracy = np.mean(predictions == y_test)
+#print(f'SVM classification accuracy: {accuracy * 100:.2f}%')
