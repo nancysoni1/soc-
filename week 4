@@ -1,0 +1,85 @@
+import librosa
+import matplotlib.pyplot as plt
+import numpy as np
+import librosa.display
+import pandas as pd
+file_path = '/content/bird_sound.wav'
+y,sr = librosa.load(file_path, sr=None)
+print(y)
+print(sr)
+from IPython.display import Audio
+Audio(data=y, rate=sr)
+plt.figure(figsize=(14,5))
+librosa.display.waveshow(y,sr=sr)
+plt.xlabel('Time (s)')
+plt.ylabel('Amplitude')
+plt.show()
+#stft mein fft(time domain ko frquency mein convert krne ka function) ko apan tukdo me krke chnages krke firse combine kr dete h
+#Higher n_fft values provide better frequency resolution but require more computation and memory.
+#Lower n_fft values provide better time resolution but poorer frequency resolution.
+#A smaller hop length (e.g., 256) increases the overlap, improving time resolution but also increasing computational cost.
+#A larger hop length (e.g., 1024) decreases the overlap, reducing computational cost but also reducing time resolution.
+def stft(y,sr,n_fft=2048,hop_length=512):#n_fft=number of samples in eacg fft window hop length= number of samples between successive frames
+  stft_result=librosa.stft(y,n_fft=n_fft,hop_length=hop_length)
+  return stft_result
+#in convert function me apan sirf stft_result paas krenge ref vo apanne define kra h jaise upar wale mwin n_fft and hop length
+
+def amplitude_to_db(stft_result,ref=np.max):
+  D = librosa.amplitude_to_db(np.abs(stft_result), ref=ref)
+  return D
+
+def zero_crossing_rate(y, frame_length=2048, hop_length=512):
+  zcr= librosa.feature.zero_crossing_rate(y, frame_length=frame_length, hop_length=hop_length)
+  return zcr
+
+def spectral_centroid(y,sr):
+  cent = librosa.feature.spectral_centroid(y=y, sr=sr)
+  return (np.mean(cent.T, axis=0))
+
+def mfccs(y,sr,n_mfcc=13):
+  mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=n_mfcc)
+  return mfcc
+
+#time stretch
+def time_stretch()
+  x = np.sin(np.linspace(-np.pi, np.pi, 4000))  # wav sample
+  y = librosa.effects.time_stretch(x, rate=4000/16000)
+  return y
+
+#pitch sfhifting the audio
+def pitch_shift(y,sr,steps=4)
+  new_y=librosa.effects.pitch_shift(y=y,sr=sr,steps=steps)
+  return new_y
+stft_result = stft(y, sr)
+D = amplitude_to_db(stft_result)
+zcr=zero_crossing_rate(y)
+cent=spectral_centroid(y,sr)
+mfcc=mfccs(y,sr)
+
+
+plt.figure(figsize=(14, 5))
+# Spectrogram
+librosa.display.specshow(D, sr=sr, hop_length=512, x_axis='time', y_axis='log')
+plt.colorbar(format='%+2.0f dB')
+plt.title('Spectrogram')
+
+# Zero Crossing Rate
+plt.plot(librosa.times_like(zcr, sr=sr, hop_length=512), zcr[0], label='Zero Crossing Rate')
+plt.xlabel('Time (s)')
+plt.ylabel('Rate')
+plt.legend()
+
+# Spectral Centroid
+plt.plot(librosa.times_like(cent, sr=sr, hop_length=512), cent[0], label='Spectral Centroid')
+plt.xlabel('Time (s)')
+plt.ylabel('Hz')
+plt.legend()
+
+#mfccs
+librosa.display.specshow(mfcc, x_axis='time')
+plt.colorbar()
+plt.title('MFCC')
+plt.xlabel('Time')
+plt.ylabel('MFCC Coefficients')
+
+plt.show()
